@@ -1,22 +1,25 @@
 import java.io.Serializable;
 
-public class Articles implements Serializable{
+public class Article implements Serializable{
     private static final long serialVersionUID = 1L;  // Serial version UID per a garantir la compatibilitat de la classe amb versions anteriors
     private String nomArticle;
-    private int quantitat;
+    private double quantitat;
     private String unitats;
+    private double unitPrice;
 
-    public Articles(String nomArticle, int quantitat, String unitats) {
+    public Article(String nomArticle, double quantitat, String unitats, double unitPrice) {
         this.nomArticle = nomArticle;
         this.quantitat = quantitat;
         this.unitats = unitats;
+        this.unitPrice = unitPrice;
     }
+    
     
     public String getNomArticle() {
         return nomArticle;
     }
 
-    public int getQuantitat() {
+    public double getQuantitat() {
         return quantitat;
     }
 
@@ -28,12 +31,20 @@ public class Articles implements Serializable{
         this.nomArticle = nomArticle;
     }
 
-    public void setQuantitat(int quantitat) {
+    public void setQuantitat(double quantitat) {
         this.quantitat = quantitat;
     }
 
     public void setUnitats(String unitats) {
         this.unitats = unitats;
+    }
+
+    public double getUnitPrice() {
+        return unitPrice;
+    }
+
+    public double getTotalPrice() {
+        return quantitat * unitPrice;
     }
 
     @Override

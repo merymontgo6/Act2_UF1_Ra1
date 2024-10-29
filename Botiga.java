@@ -17,8 +17,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class Botiga {
-    private static ArrayList<Client> encarrecs = new ArrayList<>(); // Llista de clients amb els seus encàrrecs
-    private static File dir = new File ("C:\\Users\\karolayn\\DAM\\M06\\Act1_UF1_Ra1\\fitxers"); //path
+    private static ArrayList<Encarrecs> encarrecs = new ArrayList<>(); // Llista de clients amb els seus encàrrecs
+    private static File dir = new File ("C:\\Users\\karolayn\\DAM\\M06\\Act2_UF1_Ra1\\fitxers"); //path
 
     public static void main(String[] args) throws Exception {
         
@@ -52,63 +52,71 @@ public class Botiga {
         }
     }
 
-    public static Integer infoClient(BufferedReader reader) throws IOException { 
-        boolean afegirMesEncarrecs = true;
-        
-         // s'introdueix tota la informació del client
-        System.out.println("Introdueix el nom del client:");
-        String nomClient = reader.readLine();
-        System.out.println("Introdueix el telèfon del client:");
-        Integer telClient = Integer.parseInt(reader.readLine());
+    public static void infoClient(BufferedReader reader) throws IOException {
+        boolean afegirMesEncarrecs;
+    
+        do {
+            // S'introdueix tota la informació del client
+            System.out.println("Introdueix el nom del client:");
+            String nomClient = reader.readLine();
+            System.out.println("Introdueix el telèfon del client:");
+            Integer telClient = Integer.parseInt(reader.readLine());
+    
+            System.out.println("Introdueix la data (dd/MM/yyyy):");
+            String dataEncarrec = reader.readLine();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate dataLliurament = LocalDate.parse(dataEncarrec, formatter);
+    
+            ArrayList<Article> articles = demanarArticles(reader); // Array per afegir articles
+    
+            Encarrecs nouEncarrec = new Encarrecs(nomClient, telClient, dataLliurament, articles);
 
-        System.out.println("Introdueix la data (dd/MM/aaaa):");
-        String dataEncarrec = reader.readLine();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate dataLliurament = LocalDate.parse(dataEncarrec, formatter);
-        
-        ArrayList<Articles> articles = demanarArticles(reader); //array per afegir articles
-
-        Client nouClient = new Client(nomClient, telClient, dataLliurament, articles);
-        encarrecs.add(nouClient);
-        System.out.println("Encàrrec generat amb èxit!");
-        System.out.println("Voleu afegir més Encarrecs? (si/no)");
+            encarrecs.add(nouEncarrec);
+            System.out.println("Encàrrec generat amb èxit!");
+    
+            // Pregunta si es vol afegir més encàrrecs
+            System.out.println("Voleu afegir més Encarrecs? (si/no)");
             String resposta = reader.readLine();
-            if (!resposta.equalsIgnoreCase("si")) {
-                afegirMesEncarrecs = false;
-            }
-
+            afegirMesEncarrecs = resposta.equalsIgnoreCase("si");
+    
+        } while (afegirMesEncarrecs);
+    
+        // Opcions per generar el fitxer després de finalitzar tots els encàrrecs
         System.out.println("Com es vol generar el fitxer?\n1. Generar un fitxer de text amb format albarà\n2. Generar un fitxer de text csv\n3. Generar un fitxer binari");
         int opcio = Integer.parseInt(reader.readLine());
+        Encarrecs clientFinal = encarrecs.get(encarrecs.size() - 1); // Obtenim l'últim encàrrec afegit
+    
         switch (opcio) {
             case 1:
-                generarFitxerAlbara(nouClient);
+                //generarFitxerAlbara(clientFinal);
                 break;
             case 2:
-                generarFitxerCSV(nouClient);
+                //enerarFitxerCSV(clientFinal);
                 break;
             case 3:
-                generarFitxerBinari(nouClient, dataEncarrec, articles);
+                //generarFitxerBinari(clientFinal);
                 break;
             default:
                 System.out.println("Opció no vàlida. Si us plau, tria una opció correcta.");
                 break;
         }
-        return opcio;
     }
     
 
-    public static ArrayList<Articles> demanarArticles(BufferedReader reader) throws IOException {
-        ArrayList<Articles> articles = new ArrayList<>();
+    public static ArrayList<Article> demanarArticles(BufferedReader reader) throws IOException {
+        ArrayList<Article> articles = new ArrayList<>();
         boolean afegirMesArticles = true; //bool per saber si l'usuari vol afegir més articles
 
         while (afegirMesArticles) {
             System.out.println("Introdueix el nom de l'article:");
             String nomArticle = reader.readLine();
             System.out.println("Introdueix la quantitat:");
-            int quantitat = Integer.parseInt(reader.readLine());
+            double quantitat = Double.parseDouble(reader.readLine());
             System.out.println("Introdueix les unitats:");
             String unitats = reader.readLine();
-            Articles nouArticle = new Articles(nomArticle, quantitat, unitats);
+            System.out.println("Introdueix el preu unitari:");
+            double unitPrice = Double.parseDouble(reader.readLine());
+            Article nouArticle = new Article(nomArticle, quantitat, unitats, unitPrice);
             articles.add(nouArticle);
 
             System.out.println("Voleu afegir més articles? (si/no)");
@@ -120,19 +128,19 @@ public class Botiga {
         return articles;
     }
 
-    public static void generarFitxerAlbara(Client client)  throws IOException {
-        String nomCli = client.getNomClient().replace(" ", "_");
+    /*public static void generarFitxerAlbara(Encarrecs encarrecs)  throws IOException {
+        String nomCli = encarrecs.getNomClient().replace(" ", "_");
         // path on es guardarà els fitxers
         String fileName = "C:\\Users\\karolayn\\DAM\\M06\\Act1_UF1_Ra1\\fitxers\\encarrecs_albara_client_" + nomCli + "_" + System.currentTimeMillis() + ".txt";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             // bufferwritter per recollir les dades i que es guarden dins del fitxer
-            writer.write("Nom del client: " + client.getNomClient());
+            writer.write("Nom del client: " + encarrecs.getNomClient());
             writer.newLine();
-            writer.write("Telefon del client: " + client.getTelClient());
+            writer.write("Telefon del client: " + encarrecs.getTelClient());
             writer.newLine();
             
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            writer.write("Data de l'encarrec: " + client.getDataEncarrec().format(formatter));
+            writer.write("Data de l'encarrec: " + encarrecs.getDataEncarrec().format(formatter));
             writer.newLine();
             writer.newLine();
             
@@ -150,7 +158,7 @@ public class Botiga {
         } catch (IOException e) {
             System.out.println("Error al generar l'albarà.");
         }
-    }
+    }*/
 
     public static void generarFitxerCSV(Client client) throws IOException {
     String nomCli = client.getNomClient().replace(" ", "_");
@@ -165,7 +173,7 @@ public class Botiga {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         // Escribir los artículos
-        for (Articles article : client.getArticles()) {
+        for (Article article : client.getArticles()) {
             writer.write(client.getNomClient() + ";" + 
                          client.getTelClient() + ";" + 
                          client.getDataEncarrec().format(formatter) + ";" +
@@ -182,7 +190,7 @@ public class Botiga {
     }
 }
 
-    public static void generarFitxerBinari(Client client, String dataEncarrec, ArrayList<Articles> articles) throws IOException {
+    public static void generarFitxerBinari(Client client, String dataEncarrec, ArrayList<Article> articles) throws IOException {
         String nomCli = client.getNomClient().replace(" ", "_");
         String fileName = "C:\\Users\\karolayn\\DAM\\M06\\Act1_UF1_Ra1\\fitxers\\encarrecs_binari_client_" + nomCli + "_" + System.currentTimeMillis() + ".dat";
         
@@ -196,9 +204,9 @@ public class Botiga {
         str1.writeInt(articles.size());
 
         // Escribir cada artículo
-        for (Articles article : articles) {
+        for (Article article : articles) {
             str1.writeUTF(article.getNomArticle());
-            str1.writeInt(article.getQuantitat());
+            str1.writeInt((int) article.getQuantitat());
             str1.writeUTF(article.getUnitats());
             }
         } catch (FileNotFoundException e) {
@@ -295,38 +303,27 @@ public class Botiga {
         }
     }
 
-    public static void SerEnc(String[] args) {
-        Encarrecs[] encarrecs = new Encarrecs[1000];
-        
-        Articles[] articles = new Articles[1000];
-        articles[0] = new Articles("Arroz", 10, "kg");
-        articles[1] = new Articles("Llet", 2, "kg");
-        ObjectOutputStream serializador = null;
-
-        try {
-            serializador = new ObjectOutputStream(new FileOutputStream("EncarrecesSer.dat"));
-            serializador.writeObject(articles);
-            serializador.close();
-        } catch (Exception e) {
-            System.out.print(e.getMessage());
-        }
-    }
-
-    public static void DerEnc(String[] args) {
-
-        ObjectInputStream deserialitzador = null;
-        try {
-            deserialitzador = new ObjectInputStream(new FileInputStream("EncarrecesDer.dat"));
-            Encarrecs[] listaEncarrecs = (Encarrecs[]) deserialitzador.readObject();
-
-            for(Encarrecs enc:listaEncarrecs) {
-                System.out.println(enc);
-        }
-        deserialitzador.close();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+    public static void SerEnc() {
+        try (ObjectOutputStream serializador = new ObjectOutputStream(new FileOutputStream("C:\\Users\\karolayn\\DAM\\M06\\Act2_UF1_Ra1\\fitxers2\\EncarrecesSer.dat"))) {
+            serializador.writeObject(encarrecs); // Guarda tot l'ArrayList de encàrrecs
+            System.out.println("Encàrrecs serialitzats correctament.");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error durant la serialització dels encàrrecs: " + e.getMessage());
         }
     }
+    
+    public static void DerEnc() {
+        try (ObjectInputStream deserialitzador = new ObjectInputStream(new FileInputStream("C:\\Users\\karolayn\\DAM\\M06\\Act2_UF1_Ra1\\fitxers2\\EncarrecesSer.dat"))) {
+            encarrecs = (ArrayList<Encarrecs>) deserialitzador.readObject(); // Carrega l'ArrayList de encàrrecs
+            System.out.println("Encàrrecs deserialitzats correctament.");
+            
+            // Mostra els encàrrecs carregats
+            for (Encarrecs enc : encarrecs) {
+                System.out.println(enc);
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error durant la deserialització dels encàrrecs: " + e.getMessage());
+        }
+    }
+    
 }

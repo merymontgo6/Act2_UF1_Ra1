@@ -2,24 +2,38 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-public class Encarrecs implements Serializable{
+public class Encarrecs implements Serializable {
     private static final long serialVersionUID = 1L;
     private int idEncarrec;
     private String nomClient;
     private int telClient;
-    private LocalDate dataEncarrec;
-    private ArrayList<Articles> articles;
-    private int preuTotalEncarrec;
-    
-    public Encarrecs() {}
-    
-    public Encarrecs(Client client, ArrayList<Articles> articles) {
-        this.nomClient = client.getNomClient();
-        this.telClient = client.getTelClient();
-        this.dataEncarrec = client.getDataEncarrec();
+    private LocalDate dataLliurament;
+    private ArrayList<Article> articles;
+    private double preuTotalEncarrec; // Canviat a double per a millor precisió
+
+    public Encarrecs(String nomClient, int telClient, LocalDate dataLliurament, ArrayList<Article> articles) {
+        this.nomClient = nomClient;
+        this.telClient = telClient;
+        this.dataLliurament = dataLliurament;
         this.articles = articles;
+        this.preuTotalEncarrec = calcularTotalEncarrec(); // Opcional: calcular total a l'inici
     }
-    
+    public LocalDate getDataEncarrec() {
+        return dataLliurament;
+    }
+
+    public ArrayList<Article> getArticles() {
+        return articles;
+    }
+
+    public final double calcularTotalEncarrec() {
+        double total = 0; // Inicialitzem a zero
+        for (Article article : articles) {
+            total += article.getTotalPrice(); // Suposant que getTotalPrice() retorna el preu total de l'article
+        }
+        return total;
+    }
+
     public int getIdEncarrec() {
         return idEncarrec;
     }
@@ -27,6 +41,7 @@ public class Encarrecs implements Serializable{
     public void setIdEncarrec(int idEncarrec) {
         this.idEncarrec = idEncarrec;
     }
+
     public String getNomClient() {
         return nomClient;
     }
@@ -34,6 +49,7 @@ public class Encarrecs implements Serializable{
     public void setNomClient(String nomClient) {
         this.nomClient = nomClient;
     }
+
     public int getTelClient() {
         return telClient;
     }
@@ -42,33 +58,30 @@ public class Encarrecs implements Serializable{
         this.telClient = telClient;
     }
 
-    public LocalDate getDataEncarrec() {
-        return dataEncarrec;
+    public LocalDate getDataLliurament() {
+        return dataLliurament;
     }
 
-    public void setDataEncarrec(LocalDate dataEncarrec) {
-        this.dataEncarrec = dataEncarrec;
+    public void setDataLliurament(LocalDate dataLliurament) {
+        this.dataLliurament = dataLliurament;
     }
 
-    // Getter y Setter para articles
-    public ArrayList<Articles> getArticles() {
-        return articles;
-    }
-
-    public void setArticles(ArrayList<Articles> articles) {
+    public void setArticles(ArrayList<Article> articles) {
         this.articles = articles;
+        this.preuTotalEncarrec = calcularTotalEncarrec(); // Recalculant el preu total si els articles canvien
     }
 
-    public int getPreuTotalEncarrec() {
-        return preuTotalEncarrec;
+    public double getPreuTotalEncarrec() {
+        return preuTotalEncarrec; // Canviat a double
     }
 
-    public void setPreuTotalEncarrec(int preuTotalEncarrec) {
-        this.preuTotalEncarrec = preuTotalEncarrec;
-    }
-    
     @Override
     public String toString() {
-        return "Encarrec [client=" + client.getNomClient() + ", articles=" + articles.toString();
+        return "Encarrec [idEncarrec=" + idEncarrec +
+                ", nomClient=" + nomClient +
+                ", telClient=" + telClient +
+                ", dataEncarrec=" + dataLliurament +
+                ", articles=" + articles +
+                ", preuTotalEncarrec=" + preuTotalEncarrec + "]";
     }
 }
