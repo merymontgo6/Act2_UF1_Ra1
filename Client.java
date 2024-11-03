@@ -45,7 +45,7 @@ public class Client implements Serializable{
         this.dataEncarrec = dataEncarrec;
     }
 
-    public void setArticles(ArrayList articles) {
+    public void setArticles(ArrayList<Article> articles) {
         this.articles = articles;
     }
     @Override

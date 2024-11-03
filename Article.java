@@ -1,20 +1,19 @@
 import java.io.Serializable;
 
-public class Article implements Serializable{
-    private static final long serialVersionUID = 1L;  // Serial version UID per a garantir la compatibilitat de la classe amb versions anteriors
+public class Article implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String nomArticle;
     private double quantitat;
     private String unitats;
-    private double unitPrice;
+    private double preu;
 
-    public Article(String nomArticle, double quantitat, String unitats, double unitPrice) {
+    public Article(String nomArticle, double quantitat, String unitats, double preu) {
         this.nomArticle = nomArticle;
         this.quantitat = quantitat;
         this.unitats = unitats;
-        this.unitPrice = unitPrice;
+        this.preu = preu;
     }
-    
-    
+
     public String getNomArticle() {
         return nomArticle;
     }
@@ -39,20 +38,20 @@ public class Article implements Serializable{
         this.unitats = unitats;
     }
 
-    public double getUnitPrice() {
-        return unitPrice;
+    public double getPreu() {
+        return preu;
     }
 
     public double getTotalPrice() {
-        return quantitat * unitPrice;
+        return quantitat * preu;
     }
 
     @Override
     public String toString() {
-        return "Article: " + nomArticle + ", Quantitat: " + quantitat + " " + unitats;
+        return "Article: " + nomArticle + ", Quantitat: " + quantitat + " " + unitats + ", Preu unitari: " + preu;
     }
-    
+
     public String toCSV() {
-        return nomArticle + ";" + quantitat + ";" + unitats + ";";
+        return nomArticle + ";" + quantitat + ";" + unitats + ";" + preu + ";";
     }
 }

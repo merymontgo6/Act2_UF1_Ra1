@@ -1,24 +1,22 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.RandomAccessFile;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class Botiga {
     private static ArrayList<Encarrecs> encarrecs = new ArrayList<>(); // Llista de clients amb els seus encàrrecs
-    private static File dir = new File ("C:\\Users\\karolayn\\DAM\\M06\\Act2_UF1_Ra1\\fitxers"); //path
+    private static File dir = new File ("C:\\Users\\karolayn\\DAM\\M06\\Act2_UF1_Ra1\\fitxers2"); //path
 
     public static void main(String[] args) throws Exception {
         
@@ -82,26 +80,25 @@ public class Botiga {
         } while (afegirMesEncarrecs);
     
         // Opcions per generar el fitxer després de finalitzar tots els encàrrecs
-        System.out.println("Com es vol generar el fitxer?\n1. Generar un fitxer de text amb format albarà\n2. Generar un fitxer de text csv\n3. Generar un fitxer binari");
+        System.out.println("Com es vol generar el fitxer?\n1. Generar un fitxer de text amb format albarà\n2. Generar un fitxer de text csv\n3. Generar un fitxer binari\n4. Generar Serial de Encarrecs\n5.Generar fitxer aleatori");
         int opcio = Integer.parseInt(reader.readLine());
-        Encarrecs clientFinal = encarrecs.get(encarrecs.size() - 1); // Obtenim l'últim encàrrec afegit
+        //Client clientFinal = encarrecs.get(encarrecs.size() - 1); // Obtenim l'últim encàrrec afegit
     
         switch (opcio) {
-            case 1:
-                //generarFitxerAlbara(clientFinal);
-                break;
-            case 2:
-                //enerarFitxerCSV(clientFinal);
-                break;
-            case 3:
+            case 1 -> { //generarFitxerAlbara(clientFinal);
+            }
+            case 2 -> {//enerarFitxerCSV(clientFinal);
+            }
+            case 3 -> {
                 //generarFitxerBinari(clientFinal);
-                break;
-            default:
-                System.out.println("Opció no vàlida. Si us plau, tria una opció correcta.");
-                break;
+            }
+            case 4 -> { generarSerEnc(encarrecs);
+            }
+            case 5 -> { generarFitxerAleatori(encarrecs);
+            }
+            default -> System.out.println("Opció no vàlida. Si us plau, tria una opció correcta.");
+            }
         }
-    }
-    
 
     public static ArrayList<Article> demanarArticles(BufferedReader reader) throws IOException {
         ArrayList<Article> articles = new ArrayList<>();
@@ -160,7 +157,7 @@ public class Botiga {
         }
     }*/
 
-    public static void generarFitxerCSV(Client client) throws IOException {
+    /*public static void generarFitxerCSV(Client client) throws IOException {
     String nomCli = client.getNomClient().replace(" ", "_");
     String fileName = "C:\\Users\\karolayn\\DAM\\M06\\Act1_UF1_Ra1\\fitxers\\encarrecs_csv_client_" + nomCli + "_" + System.currentTimeMillis() + ".csv";
     
@@ -188,9 +185,9 @@ public class Botiga {
         System.out.println("Error al generar el fitxer CSV.");
         e.printStackTrace(); // Es útil imprimir la traza de error para depuración
     }
-}
+}*/
 
-    public static void generarFitxerBinari(Client client, String dataEncarrec, ArrayList<Article> articles) throws IOException {
+    /*public static void generarFitxerBinari(Client client, String dataEncarrec, ArrayList<Article> articles) throws IOException {
         String nomCli = client.getNomClient().replace(" ", "_");
         String fileName = "C:\\Users\\karolayn\\DAM\\M06\\Act1_UF1_Ra1\\fitxers\\encarrecs_binari_client_" + nomCli + "_" + System.currentTimeMillis() + ".dat";
         
@@ -216,10 +213,52 @@ public class Botiga {
             System.out.println("Error al generar el fitxer binari: " + e.getMessage());
         }
 
+    }*/
+
+    public static void generarSerEnc(ArrayList<Encarrecs> encarrecs) {
+        try (ObjectOutputStream serializador = new ObjectOutputStream(new FileOutputStream(dir + "\\encarrec_" + System.currentTimeMillis() + ".bin"))) {
+            serializador.writeObject(encarrecs); // Guarda tot l'ArrayList de encàrrecs
+            System.out.println("Encàrrecs serialitzats correctament.");
+        } catch (IOException e) {
+            System.out.println("Error durant la serialització dels encàrrecs: " + e.getMessage());
+        }
+    }
+
+    public static void generarFitxerAleatori(ArrayList<Encarrecs> encarrecs) throws FileNotFoundException, IOException {
+        RandomAccessFile raw1 = new RandomAccessFile(dir + "\\encarrec_" + System.currentTimeMillis() + ".txt", "rw");
+        for (Encarrecs encarrec:encarrecs){
+
+            int longRecord = 0;
+            StringBuffer sbf1 = null;
+
+            sbf1 = new StringBuffer(encarrec.getNomClient());
+            sbf1.setLength(50);
+            raw1.writeChars(sbf1.toString());
+            //2 bytes per cada char escrit.
+            longRecord += sbf1.toString().length() * 2; 
+            // resta de codi a implementar, on anirem repetint i afegint les longituds de cada //camp
+            //al final escrivim la longitud
+            sbf1 = new StringBuffer(String.valueOf(encarrec.getTelClient()));
+            sbf1.setLength(10);
+            raw1.writeChars(sbf1.toString());
+            longRecord += sbf1.toString().length() * 2;
+
+            sbf1 = new StringBuffer(encarrec.getDataLliurament().toString());
+            sbf1.setLength(10);
+            raw1.writeChars(sbf1.toString());
+            longRecord += sbf1.toString().length() * 2;
+
+            sbf1 = new StringBuffer(String.valueOf(encarrec.getPreuTotalEncarrec()));
+            raw1.writeChars(sbf1.toString());
+            longRecord += sbf1.toString().length() * 2;
+
+           raw1.writeInt(longRecord);
+       }
+
     }
 
     public static void mostrarEncarrecs(BufferedReader reader) throws IOException {
-        System.out.println("Com es vol obrir el fitxer?\n1. Fitxer de text CSV\n2. Fitxer binari");
+        System.out.println("Com es vol obrir el fitxer?\n1. Fitxer de text CSV\n2. Fitxer binari\n3. Fitxer de text serializat");
         String option = reader.readLine();
         int opcio = Integer.parseInt(option);
 
@@ -229,15 +268,10 @@ public class Botiga {
 
         // Mostrar contingut en funció de l'opció escollida
         switch (opcio) {
-            case 1:
-                mostrarEncarrecCSV(filePath);
-                break;
-            case 2:
-                mostrarEncarrecBinari(filePath);
-                break;
-            default:
-                System.out.println("Opció no vàlida. Si us plau, tria una opció correcta.");
-                break;
+            case 1 -> mostrarEncarrecCSV(filePath);
+            case 2 -> mostrarEncarrecBinari(filePath);
+            case 3 -> mostrarDerEnc(filePath);
+            default -> System.out.println("Opció no vàlida. Si us plau, tria una opció correcta.");
         }
     }
 
@@ -302,18 +336,10 @@ public class Botiga {
             e.printStackTrace();
         }
     }
-
-    public static void SerEnc() {
-        try (ObjectOutputStream serializador = new ObjectOutputStream(new FileOutputStream("C:\\Users\\karolayn\\DAM\\M06\\Act2_UF1_Ra1\\fitxers2\\EncarrecesSer.dat"))) {
-            serializador.writeObject(encarrecs); // Guarda tot l'ArrayList de encàrrecs
-            System.out.println("Encàrrecs serialitzats correctament.");
-        } catch (IOException e) {
-            System.out.println("Error durant la serialització dels encàrrecs: " + e.getMessage());
-        }
-    }
     
-    public static void DerEnc() {
-        try (ObjectInputStream deserialitzador = new ObjectInputStream(new FileInputStream("C:\\Users\\karolayn\\DAM\\M06\\Act2_UF1_Ra1\\fitxers2\\EncarrecesSer.dat"))) {
+    @SuppressWarnings("unchecked")
+    public static void mostrarDerEnc(String filePath) {
+        try (ObjectInputStream deserialitzador = new ObjectInputStream(new FileInputStream(filePath))) {
             encarrecs = (ArrayList<Encarrecs>) deserialitzador.readObject(); // Carrega l'ArrayList de encàrrecs
             System.out.println("Encàrrecs deserialitzats correctament.");
             
@@ -325,5 +351,4 @@ public class Botiga {
             System.out.println("Error durant la deserialització dels encàrrecs: " + e.getMessage());
         }
     }
-    
 }

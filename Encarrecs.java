@@ -29,7 +29,7 @@ public class Encarrecs implements Serializable {
     public final double calcularTotalEncarrec() {
         double total = 0; // Inicialitzem a zero
         for (Article article : articles) {
-            total += article.getTotalPrice(); // Suposant que getTotalPrice() retorna el preu total de l'article
+            total += article.getTotalPrice();
         }
         return total;
     }
