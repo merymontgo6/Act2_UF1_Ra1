@@ -11,7 +11,8 @@ public class Encarrecs implements Serializable {
     private ArrayList<Article> articles;
     private double preuTotalEncarrec; // Canviat a double per a millor precisió
 
-    public Encarrecs(String nomClient, int telClient, LocalDate dataLliurament, ArrayList<Article> articles) {
+    public Encarrecs(int idEncarrec,String nomClient, int telClient, LocalDate dataLliurament, ArrayList<Article> articles) {
+        this.idEncarrec = idEncarrec;
         this.nomClient = nomClient;
         this.telClient = telClient;
         this.dataLliurament = dataLliurament;

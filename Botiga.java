@@ -15,8 +15,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class Botiga {
+    private static int idCounter = 1;
     private static ArrayList<Encarrecs> encarrecs = new ArrayList<>(); // Llista de clients amb els seus encàrrecs
-    private static File dir = new File ("C:\\Users\\karolayn\\DAM\\M06\\Act2_UF1_Ra1\\fitxers2"); //path
+    private static final File dir = new File ("C:\\Users\\karolayn\\DAM\\M06\\Act2_UF1_Ra1\\fitxers2"); //path
 
     public static void main(String[] args) throws Exception {
         
@@ -31,18 +32,10 @@ public class Botiga {
                 int opcio = Integer.parseInt(option);
 
                 switch (opcio) {
-                    case 1: 
-                        infoClient(reader);
-                        break;
-                    case 2: 
-                        mostrarEncarrecs(reader);
-                        break;
-                    case 3: 
-                        sortir = true;
-                        break;
-                    default: 
-                        System.out.println("Opció no vàlida. Si us plau, tria una opció correcta.");
-                        break;
+                    case 1 -> infoClient(reader);
+                    case 2 -> mostrarEncarrecs(reader);
+                    case 3 -> sortir = true;
+                    default -> System.out.println("Opció no vàlida. Si us plau, tria una opció correcta.");
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -67,7 +60,7 @@ public class Botiga {
     
             ArrayList<Article> articles = demanarArticles(reader); // Array per afegir articles
     
-            Encarrecs nouEncarrec = new Encarrecs(nomClient, telClient, dataLliurament, articles);
+            Encarrecs nouEncarrec = new Encarrecs(idCounter++, nomClient, telClient, dataLliurament, articles);
 
             encarrecs.add(nouEncarrec);
             System.out.println("Encàrrec generat amb èxit!");
@@ -225,58 +218,62 @@ public class Botiga {
     }
 
     public static void generarFitxerAleatori(ArrayList<Encarrecs> encarrecs) throws FileNotFoundException, IOException {
-        RandomAccessFile raw1 = new RandomAccessFile(dir + "\\encarrec_" + System.currentTimeMillis() + ".txt", "rw");
-        for (Encarrecs encarrec:encarrecs){
+        //RandomAccessFile raw1 = new RandomAccessFile(dir + "\\encarrec_" + System.currentTimeMillis() + ".txt", "rw");
+        try {RandomAccessFile raw1 = new RandomAccessFile(dir + "\\encarrec_" + System.currentTimeMillis() + ".txt", "rw");
+           
+            for (Encarrecs encarrec:encarrecs){
 
-            int longRecord = 0;
-            StringBuffer sbf1 = null;
+                int longRecord = 0;
+                StringBuffer sbf1;
 
-            sbf1 = new StringBuffer(encarrec.getNomClient());
-            sbf1.setLength(50);
-            raw1.writeChars(sbf1.toString());
-            //2 bytes per cada char escrit.
-            longRecord += sbf1.toString().length() * 2; 
-            // resta de codi a implementar, on anirem repetint i afegint les longituds de cada //camp
-            //al final escrivim la longitud
-            
-            sbf1 = new StringBuffer(String.valueOf(encarrec.getTelClient()));
-            sbf1.setLength(10);
-            raw1.writeChars(sbf1.toString());
-            longRecord += sbf1.toString().length() * 2;
+                sbf1 = new StringBuffer(encarrec.getNomClient());
+                sbf1.setLength(50);
+                raw1.writeChars(sbf1.toString());
+                //2 bytes per cada char escrit.
+                longRecord += sbf1.toString().length() * 2; 
+                //al final escrivim la longitud
+                
+                sbf1 = new StringBuffer(String.valueOf(encarrec.getTelClient()));
+                sbf1.setLength(10);
+                raw1.writeChars(sbf1.toString());
+                longRecord += sbf1.toString().length() * 2;
 
-            sbf1 = new StringBuffer(encarrec.getDataLliurament().toString());
-            sbf1.setLength(10);
-            raw1.writeChars(sbf1.toString());
-            longRecord += sbf1.toString().length() * 2;
+                sbf1 = new StringBuffer(encarrec.getDataLliurament().toString());
+                sbf1.setLength(10);
+                raw1.writeChars(sbf1.toString());
+                longRecord += sbf1.toString().length() * 2;
 
-            sbf1 = new StringBuffer(String.valueOf(encarrec.getPreuTotalEncarrec()));
-            raw1.writeChars(sbf1.toString());
-            longRecord += sbf1.toString().length() * 2;
-            
-            for (Article article : encarrec.getArticles()) {
-                StringBuffer sbf2 = null;
-                sbf2 = new StringBuffer(article.getNomArticle());
-                sbf2.setLength(30);
-                raw1.writeChars(sbf2.toString());
-                longRecord += sbf2.toString().length() * 2;
+                sbf1 = new StringBuffer(String.valueOf(encarrec.getPreuTotalEncarrec()));
+                raw1.writeChars(sbf1.toString());
+                longRecord += sbf1.toString().length() * 2;
+                
+                for (Article article : encarrec.getArticles()) {
+                    StringBuffer sbf2;
+                    sbf2 = new StringBuffer(article.getNomArticle());
+                    sbf2.setLength(30);
+                    raw1.writeChars(sbf2.toString());
+                    longRecord += sbf2.toString().length() * 2;
 
-                sbf2 = new StringBuffer(String.valueOf(article.getQuantitat()));
-                sbf2.setLength(30);
-                raw1.writeChars(sbf2.toString());
-                longRecord += sbf2.toString().length() * 2;
-
-                sbf2 = new StringBuffer(article.getUnitats());
-                sbf2.setLength(10);
-                raw1.writeChars(sbf2.toString());
-                longRecord += sbf2.toString().length() * 2;
-            
-                sbf2 = new StringBuffer(String.valueOf(article.getPreu()));
-                sbf2.setLength(30);
-                raw1.writeChars(sbf2.toString());
-                longRecord += sbf2.toString().length() * 2;
-            }
-           raw1.writeInt(longRecord);
-       }
+                    sbf2 = new StringBuffer(String.valueOf(article.getQuantitat()));
+                    sbf2.setLength(30);
+                    raw1.writeChars(sbf2.toString());
+                    longRecord += sbf2.toString().length() * 2;
+    
+                    sbf2 = new StringBuffer(article.getUnitats());
+                    sbf2.setLength(10);
+                    raw1.writeChars(sbf2.toString());
+                    longRecord += sbf2.toString().length() * 2;
+                
+                    sbf2 = new StringBuffer(String.valueOf(article.getPreu()));
+                    sbf2.setLength(30);
+                    raw1.writeChars(sbf2.toString());
+                    longRecord += sbf2.toString().length() * 2;
+                }
+            raw1.writeInt(longRecord);
+        }
+        } catch (IOException e) {
+            System.out.println("Error al generar el fitxer aleatori: " + e.getMessage());
+        }
     }
 
     public static void mostrarEncarrecs(BufferedReader reader) throws IOException {
@@ -327,7 +324,6 @@ public class Botiga {
         }
         } catch (IOException e) {
             System.out.println("Error al llegir el fitxer CSV.");
-            e.printStackTrace();
         }
     }
 
@@ -355,7 +351,6 @@ public class Botiga {
             }
         } catch (IOException e) {
             System.out.println("Error al llegir el fitxer binari: " + e.getMessage());
-            e.printStackTrace();
         }
     }
     
@@ -375,64 +370,66 @@ public class Botiga {
     }
 
     public static void mostrarEncarrecAleatori(String filePath) throws FileNotFoundException, IOException {
-        RandomAccessFile raf1 = new RandomAccessFile(filePath, "r");
-        int posicio = 0; //Declarem la variable que ens permetrà posicionar-nos al fitxer
-        //Declarem les variables dels camps que anem a llegir
-        char[] nomClientArr = new char[50];
-        char[] telefonArr = new char[15];
-        char[] dataArr = new char[10];
-        
-        char aux;
-        //condició d'iteració: fins a la longitud màxima de fitxer
-        while (raf1.getFilePointer() != raf1.length()) {
-            raf1.seek(posicio); //ens posicionem d'acord al valor de la variable posició
+        try (RandomAccessFile raf1 = new RandomAccessFile(filePath, "r")) {
+            int posicio = 0; //Declarem la variable que ens permetrà posicionar-nos al fitxer
+            char[] nomClientArr = new char[50];
+            char[] telefonArr = new char[15];
+            char[] dataArr = new char[10];
             
-            // Llegim el nom del client
-            for (int i = 0; i < nomClientArr.length; i++) {
-                aux = raf1.readChar();
-                nomClientArr[i] = aux;
-            }//Reconstruïm en un únic String
-            String nomClient = new String(nomClientArr).trim();
-            
-            // Llegim el telèfon
-            for (int i = 0; i < telefonArr.length; i++) {
-                aux = raf1.readChar();
-                telefonArr[i] = aux;
-            } String telefon = new String(telefonArr).trim();
-            
-            // Llegim la data
-            for (int i = 0; i < dataArr.length; i++) {
-                aux = raf1.readChar();
-                dataArr[i] = aux;
-            } String data = new String(dataArr).trim();
-            
-            // Llegim el nombre d'articles a la llista
-            int numArticles = raf1.readInt();
-            
-            System.out.printf("Client: %s, Telèfon: %s, Data: %s%n", nomClient, telefon, data);
-            
-            for (int j = 0; j < numArticles; j++) {
-                // Llegim el nom de l'article
-                char[] nomArticleArr = new char[30];
-                for (int i = 0; i < nomArticleArr.length; i++) {
+            char aux;
+            //condició d'iteració: fins a la longitud màxima de fitxer
+            while (raf1.getFilePointer() != raf1.length()) {
+                raf1.seek(posicio); //ens posicionem d'acord al valor de la variable posició
+                
+                // Llegim el nom del client
+                for (int i = 0; i < nomClientArr.length; i++) {
                     aux = raf1.readChar();
-                    nomArticleArr[i] = aux;
+                    nomClientArr[i] = aux;
+                }//Reconstruïm en un únic String
+                String nomClient = new String(nomClientArr);
+                
+                // Llegim el telèfon
+                for (int i = 0; i < telefonArr.length; i++) {
+                    aux = raf1.readChar();
+                    telefonArr[i] = aux;
+                } String telefon = new String(telefonArr);
+                
+                // Llegim la data
+                for (int i = 0; i < dataArr.length; i++) {
+                    aux = raf1.readChar();
+                    dataArr[i] = aux;
+                } String data = new String(dataArr);
+                
+                // Llegim el nombre d'articles a la llista
+                int numArticles = raf1.readInt();
+                
+                System.out.printf("Client: %s, Telèfon: %s, Data: %s%n", nomClient, telefon, data);
+                
+                for (int j = 0; j < numArticles; j++) {
+                    // Llegim el nom de l'article
+                    char[] nomArticleArr = new char[30];
+                    for (int i = 0; i < nomArticleArr.length; i++) {
+                        aux = raf1.readChar();
+                        nomArticleArr[i] = aux;
+                    }
+                    String nomArticle = new String(nomArticleArr);
+                    
+                    // Llegim el preu unitari i la quantitat
+                    double preuUnitari = raf1.readDouble();
+                    int quantitat = raf1.readInt();
+                    
+                    System.out.printf("  Article: %s, Preu Unitari: %.2f, Quantitat: %d%n", nomArticle, preuUnitari, quantitat);
                 }
-                String nomArticle = new String(nomArticleArr).trim();
+                // Llegim el preu total de l'encàrrec
+                double preuTotalEncarrec = raf1.readDouble();
+                System.out.printf("Total Encarrec: %.2f%n%n", preuTotalEncarrec);
                 
-                // Llegim el preu unitari i la quantitat
-                double preuUnitari = raf1.readDouble();
-                int quantitat = raf1.readInt();
-                
-                System.out.printf("  Article: %s, Preu Unitari: %.2f, Quantitat: %d%n", nomArticle, preuUnitari, quantitat);
+                // Reposicionem per anar al següent registre
+                posicio += posicio + 52;
             }
-            // Llegim el preu total de l'encàrrec
-            double preuTotalEncarrec = raf1.readDouble();
-            System.out.printf("Total Encarrec: %.2f%n%n", preuTotalEncarrec);
-            
-            // Reposicionem per anar al següent registre
-            posicio += (50 * 2) + (15 * 2) + (10 * 2) + 4 + (numArticles * (30 * 2 + 8 + 4)) + 8;
+            raf1.close();
+        } catch (IOException e) {
+            System.out.println("Error al llegir el fitxer aleatori: " + e.getMessage());
         }
-        raf1.close();
     }
 }
